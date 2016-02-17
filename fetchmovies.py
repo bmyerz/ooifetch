@@ -28,17 +28,17 @@ def moviecrawl(url):
     base = ds[u'id']
     for c in ds.find_all("thredds:catalogref"):
       newurl = urljoin(urljoin(domain,base), c[u'xlink:href'])
-      for movieurl in crawl(newurl):
+      for movieurl in moviecrawl(newurl):
         yield movieurl
     
-def download(url):
+def download(url, localroot="."):
     # Open the url
     parts = urlparse(url)
     file_name = parts.path
 
     # Open our local file for writing
     path, basefile = os.path.split(file_name)
-    localfiledir = "." + path
+    localfiledir = os.path.join(localroot,path)
     os.makedirs(localfiledir)
     local_file_name = os.path.join(localfiledir, basefile)
 
@@ -54,7 +54,7 @@ def download(url):
             f.write(chunk)
           f.close()
 
-        return file_name
+        return local_file_name
     #handle errors
     except HTTPError, e:
         print "HTTP Error:",e.code , url
@@ -63,8 +63,8 @@ def download(url):
 
 
 if __name__ == '__main__': 
-  #url = "http://opendap-devel.ooi.rutgers.edu:8080/opendap/hyrax/large_format/catalog.xml"
-  url = "http://opendap-devel.ooi.rutgers.edu:8080/opendap/hyrax/large_format/RS03ASHS-PN03B-06-CAMHDA301/2016/catalog.xml"
+  url = "http://opendap-devel.ooi.rutgers.edu:8080/opendap/hyrax/large_format/catalog.xml"
+  #url = "http://opendap-devel.ooi.rutgers.edu:8080/opendap/hyrax/large_format/RS03ASHS-PN03B-06-CAMHDA301/2016/catalog.xml"
 
   for movieurl in moviecrawl(url):
     print movieurl
